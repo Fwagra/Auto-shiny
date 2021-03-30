@@ -247,120 +247,6 @@ def send_cmd(command=NO_INPUT):
     commandSuccess = send_packet(cmd_to_packet(command))
     return commandSuccess
 
-#Test all buttons except for home and capture
-def testbench_btn():
-    send_cmd(BTN_A) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(BTN_B) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(BTN_X) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(BTN_Y) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(BTN_PLUS) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(BTN_MINUS) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(BTN_LCLICK) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(BTN_RCLICK) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-
-# Test DPAD U / R / D / L
-def testbench_dpad():
-    send_cmd(DPAD_U) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(DPAD_R) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(DPAD_D) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(DPAD_L) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-
-# Test DPAD Diagonals - Does not register on switch due to dpad buttons
-def testbench_dpad_diag():
-    send_cmd(DPAD_U_R) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(DPAD_D_R) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(DPAD_D_L) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(DPAD_U_L) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-
-# Test Left Analog Stick
-def testbench_lstick():
-    #Test U/R/D/L
-    send_cmd(BTN_LCLICK) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(LSTICK_U) ; p_wait(0.5)
-    send_cmd(LSTICK_R) ; p_wait(0.5)
-    send_cmd(LSTICK_D) ; p_wait(0.5)
-    send_cmd(LSTICK_L) ; p_wait(0.5)
-    send_cmd(LSTICK_U) ; p_wait(0.5)
-    send_cmd(LSTICK_CENTER) ; p_wait(0.5)
-
-    # 360 Circle @ Full Intensity
-    for i in range(0,721):
-        cmd = lstick_angle(i + 90, 0xFF)
-        send_cmd(cmd)
-        p_wait(0.001)
-    send_cmd(LSTICK_CENTER) ; p_wait(0.5)
-
-    # 360 Circle @ Partial Intensity
-    for i in range(0,721):
-        cmd = lstick_angle(i + 90, 0x80)
-        send_cmd(cmd)
-        p_wait(0.001)
-    send_cmd(LSTICK_CENTER) ; p_wait(0.5)
-
-# Test Right Analog Stick
-def testbench_rstick():
-    #Test U/R/D/L
-    send_cmd(BTN_RCLICK) ; p_wait(0.5) ; send_cmd() ; p_wait(0.001)
-    send_cmd(RSTICK_U) ; p_wait(0.5)
-    send_cmd(RSTICK_R) ; p_wait(0.5)
-    send_cmd(RSTICK_D) ; p_wait(0.5)
-    send_cmd(RSTICK_L) ; p_wait(0.5)
-    send_cmd(RSTICK_U) ; p_wait(0.5)
-    send_cmd(RSTICK_CENTER) ; p_wait(0.5)
-
-    # 360 Circle @ Full Intensity
-    for i in range(0,721):
-        cmd = rstick_angle(i + 90, 0xFF)
-        send_cmd(cmd)
-        p_wait(0.001)
-    send_cmd(RSTICK_CENTER) ; p_wait(0.5)
-
-    # 360 Circle @ Partial Intensity
-    for i in range(0,721):
-        cmd = rstick_angle(i + 90, 0x80)
-        send_cmd(cmd)
-        p_wait(0.001)
-    send_cmd(RSTICK_CENTER) ; p_wait(0.5)
-
-# Test Packet Speed
-def testbench_packet_speed(count=100, debug=False):
-    sum = 0
-    min = 999
-    max = 0
-    avg = 0
-    err = 0
-
-    for i in range(0, count + 1):
-
-        # Send packet and check time
-        t0 = time.perf_counter()
-        status = send_packet()
-        t1 = time.perf_counter()
-
-        # Count errors
-        if not status:
-            err += 1
-            print('Packet Error!')
-
-        # Compute times
-        delta = t1 - t0
-        if delta < min:
-            min = delta
-        if delta > max:
-            max = delta
-        sum = sum + (t1 - t0)
-
-    avg = sum / i
-    print('Min =', '{:.3f}'.format(min), 'Max =', '{:.3}'.format(max), 'Avg =', '{:.3f}'.format(avg), 'Errors =', err)
-
-def testbench():
-    testbench_btn()
-    testbench_dpad()
-    testbench_lstick()
-    testbench_rstick()
-    testbench_packet_speed()
-    return
-
 # Force MCU to sync
 def force_sync():
     # Send 9x 0xFF's to fully flush out buffer on device
@@ -396,6 +282,9 @@ def sync():
             inSync = send_packet()
     return inSync
 
+
+
+# -------------------------------------------- APP ---------------------------------------------------------
 def translateCommand(command):
     if command == 'a':
         send_cmd(BTN_A) ; p_wait(0.3) ; send_cmd() ; p_wait(0.5)
@@ -519,9 +408,9 @@ def hatch_bike(nbloops = 7):
 # - Stay at the right side  of the female NPC,  on the bottom side of the bridge
 ###
 def hatch():
-    print('Combien de boîtes à faire éclore ? :')
+    print('How many boxes to hatch ? :')
     boxes = int(input())
-    print('Boucles à vélo (par défaut pour 5500 pas) :')
+    print('Bike loops (7 = 5500 steps) :')
     nbloops = int(input())
     start_time = time.time()
     # 5500 step = 7 loops
@@ -566,7 +455,6 @@ def hatch():
                 translateCommand('rstep')
             
             p_wait(1)
-            # appuyer sur b, attendre x secondes puis a
             translateCommand('b')
             p_wait(16)
             translateCommand('b')
@@ -630,7 +518,7 @@ def hatch():
 # 
 ###
 def release_pokemons():
-    print('Combien de boîtes à libérer ?')
+    print('How many boxes to release ?')
     boxes = int(input())
     start_time = time.time()
     releasedPkm = 0
@@ -669,11 +557,13 @@ def release():
 
 
 ###
-#   Récupérer les oeufs et les mettre dans le PC (avoir 6 pkm dans l'équipe)
-# COmmencer avec le curseur de menu sur la MAP
+# Get eggs from the daycare
+#   - Must have 6 pkm in the team
+#   - Bike off
+#   - Cursor's menu over the map
 ###
 def eggs():
-    print('Combien d\'oeufs récupérer ?')
+    print('How many eggs to pick ?')
     projectedEggs = int(input())
     start_time = time.time()
     translateCommand('lstep')
@@ -682,7 +572,7 @@ def eggs():
     eggs = 0
     while eggs < projectedEggs:
         eggs_bike() 
-        print('ouveture menu')          
+        print('Opening menu')          
         p_wait(.5)
         translateCommand('x')
         p_wait(1)
@@ -694,14 +584,14 @@ def eggs():
         p_wait(.3)
         translateCommand('a')
         # Ouverture map
-        print('ouveture map')          
+        print('Opening map')          
         p_wait(2)
         translateCommand('tr')
         p_wait(.5)
         translateCommand('a')
         p_wait(.5)
         translateCommand('menua')
-        print('envol')          
+        print('Flying')          
         #envol
         p_wait(3)
         translateCommand('min')
@@ -711,7 +601,7 @@ def eggs():
         translateCommand('lstep')
         p_wait(.5)
         translateCommand('ustep')
-        print('récupération oeuf')          
+        print('Picking egg')          
         p_wait(.5)
         translateCommand('a')
         p_wait(1)
@@ -734,15 +624,13 @@ def eggs():
         translateCommand('menub')
         p_wait(.5)
         eggs = eggs +1
-        print('oeufs récupérés : ')
+        print('eggs picked : ')
         print(eggs)
     
     elapsed_time = time.time() - start_time
     print(time.strftime("%H:%M:%S", time.gmtime(elapsed_time)))
 
 
-    # A .5
-    # 
 # -------------------------------------------------------------------------
 
 # ser = serial.Serial(port=args.port, baudrate=57600,timeout=1)
@@ -755,18 +643,15 @@ ser = serial.Serial(port=args.port, baudrate=19200,timeout=1)
 if not sync():
     print('Could not sync!')
 
-#if not send_cmd(BTN_A + DPAD_U_R + LSTICK_U + RSTICK_D_L):
- #   print('Packet Error!')
 
 p_wait(0.05)
 
 if not send_cmd():
     print('Packet Error!')
 
-# testbench()
-# testbench_packet_speed(1000)
+
 while True:
-    print('Commande')
+    print('Command : ')
     command = input()
     translateCommand(command)
     
