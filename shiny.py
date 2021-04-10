@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import argparse
 import serial
 import select
@@ -8,8 +9,13 @@ import time
 import math
 
 parser = argparse.ArgumentParser('Client for sending controller commands to a controller emulator')
-parser.add_argument('port')
+parser.add_argument('--port')
+parser.add_argument('--command')
+parser.add_argument('--eggs')
+parser.add_argument('--cycles')
+parser.add_argument('--boxes')
 args = parser.parse_args()
+
 
 STATE_OUT_OF_SYNC   = 0
 STATE_SYNC_START    = 1
@@ -285,7 +291,7 @@ def sync():
 
 
 # -------------------------------------------- APP ---------------------------------------------------------
-def translateCommand(command):
+def translateCommand(command, time = 1):
     if command == 'a':
         send_cmd(BTN_A) ; p_wait(0.3) ; send_cmd() ; p_wait(0.5)
     elif command == 'b':
@@ -312,10 +318,18 @@ def translateCommand(command):
         send_cmd(LSTICK_L) ; p_wait(0.3) ; send_cmd(LSTICK_CENTER) ; p_wait(0.1)
     elif command == 'ustep':
         send_cmd(LSTICK_U) ; p_wait(0.3) ; send_cmd(LSTICK_CENTER) ; p_wait(0.1)
+    elif command == 'moveup':
+        send_cmd(LSTICK_U) ; p_wait(time) ; send_cmd(LSTICK_CENTER) ; p_wait(0.1)
     elif command == 'lsteps':
         send_cmd(LSTICK_L) ; p_wait(5) ; send_cmd(LSTICK_CENTER) ; p_wait(0.5)
     elif command == 'rsteps':
         send_cmd(LSTICK_R) ; p_wait(5) ; send_cmd(LSTICK_CENTER) ; p_wait(0.5)
+    elif command == 'reset':
+        send_cmd(LSTICK_R + RSTICK_R) ; p_wait(.2) ; send_cmd(LSTICK_CENTER + RSTICK_CENTER) ; p_wait(0.5)
+    elif command == 'turnback':
+        send_cmd(RSTICK_R) ; p_wait(2) ; send_cmd(RSTICK_CENTER) ; p_wait(0.5)
+    elif command == 'quarterturn':
+        send_cmd(RSTICK_R) ; p_wait(1) ; send_cmd(RSTICK_CENTER) ; p_wait(0.5)
     elif command == 'c':
         send_cmd(LSTICK_CENTER)
     elif command == 'R':
@@ -332,8 +346,8 @@ def translateCommand(command):
         send_cmd(BTN_MINUS); p_wait(0.3)  ; send_cmd() ; p_wait(0.001)
     elif command == 'tr':
         send_cmd(LSTICK_U_R) ; p_wait(0.05) ; send_cmd(LSTICK_CENTER)
-    elif command == 't':
-        send_cmd(LSTICK_L + RSTICK_R) ; p_wait(50); send_cmd(LSTICK_CENTER + RSTICK_CENTER)
+    elif command == 'cycle':
+        send_cmd(LSTICK_R + RSTICK_R) ; p_wait(time); send_cmd(LSTICK_CENTER + RSTICK_CENTER)
     elif command == 'du':
         send_cmd(DPAD_U) ; p_wait(0.2) ; send_cmd() ; p_wait(0.4)
     elif command == 'dr':
@@ -361,6 +375,10 @@ def translateCommand(command):
         hatch()
     elif command == 'eggs_bike':
         eggs_bike()
+    elif command == 'pnh':
+        pickNHatch()
+    elif command == 'test':
+        testCommands()
 
 def eggs_bike():
     loops = 0
@@ -630,6 +648,100 @@ def eggs():
     elapsed_time = time.time() - start_time
     print(time.strftime("%H:%M:%S", time.gmtime(elapsed_time)))
 
+def pickNHatch(projectedEggs = '', cycles = ''):
+    if(not projectedEggs):
+        print('How many eggs to pick ?')
+        projectedEggs = int(input())
+    if(not cycles):    
+        print('How many cycles ? (look on bulbapedia)')
+        cycles = int(input())
+
+    timeToCycle = (cycles * 3.3) + 5
+    start_time = time.time()
+    hatched = 0
+
+    while(hatched != projectedEggs):
+        print('Bike step')
+        # turn back
+        translateCommand('turnback')
+        p_wait(.2)
+        translateCommand('u')
+        p_wait(.2)
+
+        # bike 
+        translateCommand('min')
+        p_wait(.2)
+        translateCommand('moveup', 1)
+        p_wait(.2)
+        
+        translateCommand('quarterturn')
+        p_wait(.2)
+
+        # loop with bike
+        translateCommand('moveup', 2)
+        p_wait(.2)
+        translateCommand('cycle', timeToCycle)
+
+        print('Egg hatching')
+        p_wait(1)
+        translateCommand('b')
+        p_wait(16)
+        translateCommand('b')
+        p_wait(2)
+
+        # bike off
+        translateCommand('min')
+        p_wait(.5)
+        translateCommand('x')
+        p_wait(1.3)
+
+        translateCommand('a')
+        print('Opening map')          
+        p_wait(2.5)
+        translateCommand('a')
+        p_wait(.5)
+        translateCommand('menua')
+        p_wait(3)
+
+
+        print('move to daycare')
+        translateCommand('turnback')
+        p_wait(.2)
+        translateCommand('rstep')
+        p_wait(.2)
+        translateCommand('moveup', 0.8)
+
+
+        print('Pick the next egg')
+        translateCommand('a')
+        p_wait(1)
+        translateCommand('a')
+        p_wait(4)
+        translateCommand('a')
+        p_wait(2)
+        translateCommand('a')
+        p_wait(.5)
+        translateCommand('a')
+        p_wait(2)
+        translateCommand('d')
+        p_wait(.2)
+        translateCommand('a')
+        p_wait(2.8)
+        translateCommand('a')
+        p_wait(1.5)
+        translateCommand('a')
+        p_wait(1)
+        hatched = hatched +1
+        print('eggs picked : ')
+        print(hatched)
+    
+    elapsed_time = time.time() - start_time
+    print(time.strftime("%H:%M:%S", time.gmtime(elapsed_time)))
+
+
+# def testCommands():
+    #commands to test
+
 
 # -------------------------------------------------------------------------
 
@@ -649,11 +761,17 @@ p_wait(0.05)
 if not send_cmd():
     print('Packet Error!')
 
+if(args.command == 'pnh'):
+    pickNHatch(int(args.eggs), int(args.cycles))
 
-while True:
-    print('Command : ')
-    command = input()
-    translateCommand(command)
+if(args.command == 'stop'):
+    translateCommand('reset')
+
+if(not args.command):
+    while True:
+        print('Command : ')
+        command = input()
+        translateCommand(command)
     
 ser.close
 
