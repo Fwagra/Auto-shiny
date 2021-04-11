@@ -105,7 +105,7 @@ form button {
     background: var(--main);
     color: var(--light);
 }
-#stop {
+.stop {
     background: var(--important);
     color: var(--light);
 }
@@ -119,4 +119,54 @@ label {
 }
 button:disabled {
     background: rgb(161, 161, 161);
+}
+
+.element {
+    display: none;
+}
+
+.element.active {
+    display: block;
+}
+
+nav ul {
+    display: flex;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav li {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+    background: var(--main);
+    color: var(--light);
+    cursor: pointer;
+    margin: 0 .5rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+}
+nav li.active {
+    position: relative;
+}
+nav li.active::before {
+    content: "●";
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 2.4rem;
+    font-size: .6rem;
+
+}
+
+.or {
+    text-align: center;
+    font-size: 2.6rem;
+    text-transform: uppercase;
+    margin: 1rem 0;
 }

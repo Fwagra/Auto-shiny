@@ -15,7 +15,29 @@ const app = {
         document.querySelector('#pokemon_choice').addEventListener('keyup', app.searchInList);
         document.querySelector('#pokemon_choice').addEventListener('click', app.emptySearch);
         document.querySelector('#search button').addEventListener('click', app.searchPokemon);
-        document.querySelector('#stop').addEventListener('click', app.stopCommand);
+        document.querySelector('#release button').addEventListener('click', app.releasePokemon);
+        document.querySelector('#boxes').addEventListener('keyup', app.updateReleasedPokemon);
+        for(let stopBtn of document.querySelectorAll('.stop')){
+            stopBtn.addEventListener('click', app.stopCommand);
+        }
+        for(let link of document.querySelectorAll('nav li')) {
+            link.addEventListener('click', app.handleNav);
+        }
+    },
+    handleNav: function(event) {
+        let page = event.currentTarget.dataset.element;
+        for(let element of document.querySelectorAll('.element')) {
+            element.classList.remove('active');
+        }
+        document.querySelector('.'+page).classList.add('active');
+        for(let link of document.querySelectorAll('nav li')) {
+            if(link.dataset.element == page) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        }
+
     },
     getDataList: function() {
         fetch("./pokemon.json")
@@ -26,6 +48,28 @@ const app = {
     },
     emptySearch: function(event) {
         event.currentTarget.value = ''; 
+    },
+    releasePokemon: function(event) {
+        event.preventDefault();
+
+        let form = document.querySelector('#release');
+
+        form.querySelector('button').disabled = true;
+        let formData = new FormData(form);
+
+        let options = {
+            method: "POST",
+            body: formData,
+        };
+
+        fetch('commands.php', options).then(res => res.json())
+        .then(function(json){
+            form.querySelector('button').disabled = false;
+        });
+    },
+    updateReleasedPokemon: function(event){
+        let boxes = event.currentTarget.value;
+        document.querySelector('#release_eggs').value = parseInt(boxes) * 30;
     },
     searchInList: function(event) {
         event.preventDefault();
@@ -150,8 +194,8 @@ const app = {
 
         fetch('commands.php', options).then(res => res.json())
         .then(function(json){
-
-        })
+            form.querySelector('button').disabled = false;
+        });
     },
     getUsbList: function() {
 

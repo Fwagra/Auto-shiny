@@ -535,13 +535,15 @@ def hatch():
 # Must be in the PC, top left of the box
 # 
 ###
-def release_pokemons():
-    print('How many boxes to release ?')
-    boxes = int(input())
+def release_pokemons(projectedRelease = ''):
+    if(not projectedRelease):
+        print('How many boxes to release ?')
+        projectedRelease = int(input())
+
     start_time = time.time()
     releasedPkm = 0
-    projectedRelease = boxes * 30
-    p_wait(.5)
+    # projectedRelease = boxes * 30
+    p_wait(1)
     while(projectedRelease != releasedPkm):
         release()
         releasedPkm += 1
@@ -580,9 +582,11 @@ def release():
 #   - Bike off
 #   - Cursor's menu over the map
 ###
-def eggs():
-    print('How many eggs to pick ?')
-    projectedEggs = int(input())
+def eggs(projectedEggs = ''):
+    if(not projectedEggs):
+        print('How many eggs to pick ?')
+        projectedEggs = int(input())
+
     start_time = time.time()
     translateCommand('lstep')
     translateCommand('lstep')
@@ -766,6 +770,9 @@ if(args.command == 'pnh'):
 
 if(args.command == 'stop'):
     translateCommand('reset')
+
+if(args.command == 'release'):
+    release_pokemons(args.eggs)
 
 if(not args.command):
     while True:

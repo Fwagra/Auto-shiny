@@ -41,6 +41,9 @@ $retval=null;
 if($command == 'pnh'){
     $shellcommand = "sudo  /usr/bin/python3 shiny.py --port ".$_COOKIE['usb']." --command pnh --eggs ".$eggs." --cycles ".$cycles." 2>&1";
 }
+if($command == 'release'){
+    $shellcommand = "sudo  /usr/bin/python3 shiny.py --port ".$_COOKIE['usb']." --command release --eggs ".$eggs." 2>&1";
+}
 
 if($command == 'usb') {
     $shellcommand = 'sudo ls /dev/ttyUSB*';
