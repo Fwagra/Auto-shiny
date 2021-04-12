@@ -33,7 +33,7 @@
                 <label for="eggs">Nombre d'oeufs</label>
                 <input type="number" name="eggs" id="eggs" value="<?= intval($_COOKIE['eggs']) ?>">
                 <label for="usb">Port USB</label>
-                <select name="usb" id="usb"></select>
+                <select name="usb" class="usb"></select>
                 <input type="hidden" name="pokemon" id="pokemon" value="<?= $_COOKIE['id'] ?>">
                 <input type="hidden" name="cycles"  id="cycles" value="<?= $_COOKIE['cycles'] ?>">
                 <input type="hidden" name="command" value="pnh">
@@ -44,12 +44,14 @@
         </div>
         <div class="element release">
             <form action="" id="release">
-                <label for="eggs">Nombre de boîtes à relâcher</label>
+                <label for="boxes">Nombre de boîtes à relâcher</label>
                 <input type="number" name="boxes" id="boxes" value="<?= round(intval($_COOKIE['eggs']) / 30) ?>">
                 <p class="or">Ou</p>
                 <label for="eggs">Nombre de pokémon à relâcher</label>
                 <input type="number" name="eggs" id="release_eggs" value="<?= intval($_COOKIE['eggs']) ?>">
                 <input type="hidden" name="command" value="release">
+                <select name="usb" class="usb"></select>
+
                 <button>Relacher !</button>
             </form>
             <button class="stop">STOP</button>

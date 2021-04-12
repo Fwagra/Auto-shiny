@@ -535,15 +535,19 @@ def hatch():
 # Must be in the PC, top left of the box
 # 
 ###
-def release_pokemons(projectedRelease = ''):
+def release_pokemons(projectedRelease = 0):
     if(not projectedRelease):
         print('How many boxes to release ?')
         projectedRelease = int(input())
+    else:
+        projectedRelease = int(projectedRelease)
 
     start_time = time.time()
     releasedPkm = 0
     # projectedRelease = boxes * 30
     p_wait(1)
+    translateCommand('min')
+
     while(projectedRelease != releasedPkm):
         release()
         releasedPkm += 1

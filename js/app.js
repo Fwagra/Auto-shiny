@@ -209,15 +209,19 @@ const app = {
         };
         fetch('commands.php', options).then(res => res.json())
         .then(function(json){
-            let select = document.querySelector('#usb');
-            for(let usb of json) {
-                let option = document.createElement('option');
-                option.value = usb;
-                option.innerText = usb;
-                if(app.getCookie('usb') == usb) {
-                    option.selected = true;
+            let select = document.querySelectorAll('.usb');
+
+            for(selectElement of select) {
+
+                for(let usb of json) {
+                    let option = document.createElement('option');
+                    option.value = usb;
+                    option.innerText = usb;
+                    if(app.getCookie('usb') == usb) {
+                        option.selected = true;
+                    }
+                    selectElement.appendChild(option);
                 }
-                select.appendChild(option);
             }
             
         })
@@ -235,6 +239,7 @@ const app = {
         fetch('commands.php', options).then(res => res.json())
         .then(function(json){
             document.querySelector('#search button').disabled = false; 
+            document.querySelector('#release button').disabled = false; 
         })
     },
     strNoAccent: function(a) {
