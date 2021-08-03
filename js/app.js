@@ -3,10 +3,13 @@
 const app = {
     suffixes: ['', '-a', '-g'],
     pokemonList : [],
+    lang: 'en',
     init: function(){
         app.getDataList();
         app.getUsbList();
         
+        app.lang = document.documentElement.lang;
+
         const image = document.querySelector('#pokemon_img');
         if(image.value != "") {
             app.updateImage(image.value);
@@ -96,7 +99,7 @@ const app = {
             }
         }
         else if(value.length >= 3) {
-            let result = app.pokemonList.filter(pokemon => pokemon.fr.toLowerCase().includes(value));
+            let result = app.pokemonList.filter(pokemon => pokemon[app.lang].toLowerCase().includes(value));
             app.populateSelect(result);
         }else {
             app.closeResults();
@@ -115,7 +118,7 @@ const app = {
             for (let pokemon of results) {
                 let newPoke = document.createElement('div');
                 newPoke.classList.add('poke-result');
-                newPoke.innerHTML = pokemon.fr;
+                newPoke.innerHTML = pokemon[app.lang];
                 newPoke.dataset.id = pokemon.id;
                 newPoke.dataset.img = app.cleanName(pokemon.fr);
                 newPoke.dataset.cycles = pokemon.cycles;
