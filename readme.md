@@ -2,6 +2,8 @@
 
 Little project automating the egg hatching, thus finding shinies, in the Nintendo Switch game Pokémon Sword & shield. It can be ran from command line or a web interface.
 
+[Video demo on Youtube](https://www.youtube.com/watch?v=aUCLPIf0x_8)
+
 It's based on the [SwitchInputEmulator](https://github.com/wchill/SwitchInputEmulator) project.
 
 ## Prerequisites
