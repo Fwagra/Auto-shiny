@@ -537,7 +537,7 @@ def hatch():
 ###
 def release_pokemons(projectedRelease = 0):
     if(not projectedRelease):
-        print('How many boxes to release ?')
+        print('How many pokemons to release ?')
         projectedRelease = int(input())
     else:
         projectedRelease = int(projectedRelease)
